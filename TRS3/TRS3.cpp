@@ -51,10 +51,21 @@ void PrintMatrix(vector<vector<double>> Matrix)
     }
     cout << "-------------------------------------------------------------" << endl;
 }
+void PrintVector(vector<double> V)
+{
+    cout << fixed << std::setprecision(5);
+    cout << "-------------------------------------------------------------" << endl;
+    for (int i = 0; i < V.size(); i++)
+    {
+        cout << setw(7) << V[i] << "  " << endl;
+    }
+    cout << "-------------------------------------------------------------" << endl;
+}
 vector<double> Matrix_Vector_Multiplication(int n, int m , double alpha, double betta, double gamma, vector<double> f)
 {
     double new_betta = betta / alpha, new_gamma = gamma / alpha;
     vector<double> temp(f.size());
+    //cout << f.size() << endl;
     // задал решение для первой строчки u 
     temp[0] = f[1] * new_betta + f[n - 1] * new_gamma;
     for (int i = 1; i < n - 2; i++)
@@ -74,12 +85,21 @@ vector<double> Matrix_Vector_Multiplication(int n, int m , double alpha, double 
     }
     // задаю решение для последней строчки 
     temp[ (m - 2) * (n - 1)] = f[1] * new_betta + f[(m - 2) * (n - 1) - (n - 1)] * new_gamma;
-    for (int i = (m - 2) * (n - 1) + 1; i < (m - 1) * (n - 1) - 1; i++)
+    for (int i = (m - 2) * (n - 1) + 1; i <= (m - 1) * (n - 1) - 2; i++)
     {
-        temp[i] = (f[ i + 1] + f[i - 1]) * new_betta + f[i + (n - 1)] * new_gamma;
+        temp[i] = (f[ i + 1] + f[i - 1]) * new_betta + f[i - (n - 1)] * new_gamma;
     }
     temp[(m - 1) * (n - 1) - 1] = f[(m - 1) * (n - 1) - 2] * new_betta + f[(m - 1) * (n - 1) - 1 - (n - 1)] * new_gamma;
     return temp;
+}
+double NormaRazn(vector<double> a1, vector<double> a2)
+{
+    double raz = 0;
+    for (int i = 0; i < a1.size(); i++)
+    {
+        raz += (a1[i] - a2[i]) * (a1[i] - a2[i]);
+    }
+    return raz;
 }
 using namespace var9;
 vector<double> Ex1(int n, int m)
@@ -149,15 +169,22 @@ vector<double> Ex1(int n, int m)
         f[i] = f[i] / alpha;
 
     vector<double> temp_u = f;
+    cout << "alpha = " << alpha << ", " << "betta = " << betta << ", " << "gamma = " << gamma << endl;
     double raz = 1;
     do
     {
-        
-    }while (raz > 1e-6)
+        vector<double> new_u = Matrix_Vector_Multiplication(n, m, alpha, betta, gamma, temp_u);
+        raz = NormaRazn(new_u, temp_u);
+        cout << raz << endl;
+        temp_u = new_u;
+    } while (raz > 1e-6);
+
+    return temp_u;
 }
 int main()
 {
-    std::cout << "Hello World!\n";
+    PrintVector(Ex1(10, 10));
+    return 0;
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
