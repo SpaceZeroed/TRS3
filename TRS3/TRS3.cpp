@@ -102,9 +102,10 @@ double NormaRazn(vector<double> a1, vector<double> a2)
     return raz;
 }
 using namespace var9;
-vector<double> Ex1(int n, int m)
+vector<double> Ex1(int n_want, int m_want) 
 {
-    double hx = Lx / n, hy = Ly / m;
+    int n = n_want - 1, m = m_want - 1;
+    double hx = Lx / n, hy = Ly / m ;
     vector<double> X(n + 1);
     vector<double> Y(m + 1);
     for (int i = 0; i <= n; i++)
@@ -112,6 +113,7 @@ vector<double> Ex1(int n, int m)
     for (int i = 0; i <= m; i++)
         Y[i] = i * hy;
     vector<double> f((n - 1) * (m - 1));
+    //cout << (m - 1) << endl;
     for (int i = 0; i <= m - 2; i++) // у рассматриваем с 1 по m - 1 элемент, а записываем как 0 .. m - 2
     {
         for (int j = 0; j <= n - 2; j++) // х, по аналогии с y с 1 по n - 1 -> 0 .. n - 2
@@ -174,16 +176,20 @@ vector<double> Ex1(int n, int m)
     do
     {
         vector<double> new_u = Matrix_Vector_Multiplication(n, m, alpha, betta, gamma, temp_u);
+        for (int i = 0; i < f.size(); i++)
+        {
+            new_u[i] += f[i];
+        }
         raz = NormaRazn(new_u, temp_u);
-        cout << raz << endl;
+        //cout << raz << endl;
         temp_u = new_u;
     } while (raz > 1e-6);
-
+    cout << "size is " << temp_u.size() << endl;
     return temp_u;
 }
 int main()
 {
-    PrintVector(Ex1(10, 10));
+    PrintVector(Ex1(10, 4));
     return 0;
 }
 
