@@ -15,9 +15,9 @@ namespace var9
     }
     double F(double x, double y)
     {
-        return 2 * PI * cos(PI * x * x) * sin(PI * y / 2)
-            - 4 * PI * PI * x * x * sin(PI * x * x) * sin(PI * y / 2)
-            - sin(PI * x * x) * PI * PI * sin(PI * y / 2) / 4;
+        return 2. * PI * cos(PI * x * x) * sin(PI * y / 2.)
+            - 4. * PI * PI * x * x * sin(PI * x * x) * sin(PI * y / 2.)
+            - sin(PI * x * x) * PI * PI * sin(PI * y / 2) / 4.;
     }
     double Lx = 1, Ly = 2;
     double phi_1(double y)
@@ -26,7 +26,7 @@ namespace var9
     }
     double phi_2(double y)
     {
-        return sin(PI * Lx * Lx) * sin(PI * y / 2);
+        return 0;
     }
     double phi_3(double x)
     {
@@ -34,7 +34,7 @@ namespace var9
     }
     double phi_4(double x)
     {
-        return sin(PI * x * x) * sin(PI * Ly / 2);
+        return 0;
     }
 };
 using namespace var9;
@@ -64,7 +64,7 @@ void PrintVector(vector<double> V)
 }
 vector<double> Make_F_vector(int n, int m)
 {
-    double hx = Lx / n, hy = Ly / m;
+    double hx = Lx / n, hy = Ly / m ;
     vector<double> X(n + 1);
     vector<double> Y(m + 1);
     for (int i = 0; i <= n; i++)
@@ -73,56 +73,59 @@ vector<double> Make_F_vector(int n, int m)
         Y[i] = i * hy;
     vector<double> f((n - 1) * (m - 1));
     //cout << (m - 1) << endl;
-    for (int i = 0; i <= m - 2; i++) // у рассматриваем с 1 по m - 1 элемент, а записываем как 0 .. m - 2
+    for (int i = 0; i < m - 1; i++) // у рассматриваем с 1 по m - 1 элемент, а записываем как 0 .. m - 2
     {
-        for (int j = 0; j <= n - 2; j++) // х, по аналогии с y с 1 по n - 1 -> 0 .. n - 2
+        for (int j = 0; j < n - 1; j++) // х, по аналогии с y с 1 по n - 1 -> 0 .. n - 2
         {
             if (i == 0)
             {
                 if (j == 0)
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_3(X[j]) / hy / hy - phi_1(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_3(X[j + 1 ]) / hy / hy - phi_1(Y[i + 1]) / hx / hx;
 
                 else if (j != n - 2)
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_3(X[j]) / hy / hy;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_3(X[j + 1]) / hy / hy;
 
                 else
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_3(X[j]) / hy / hy - phi_2(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_3(X[j + 1]) / hy / hy - phi_2(Y[i + 1]) / hx / hx;
 
             }
             else if (i != 0 && i != m - 2)
             {
                 if (j == 0)
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_1(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_1(Y[i + 1]) / hx / hx;
 
                 else if (j != n - 2)
-                    f[i * (n - 1) + j] = F(X[j], Y[i]);
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]);
 
                 else
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_2(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_2(Y[i + 1]) / hx / hx;
 
             }
             else
             {
                 if (j == 0)
                 {
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_4(X[j]) / hy / hy - phi_1(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_4(X[j + 1]) / hy / hy - phi_1(Y[i + 1]) / hx / hx;
                 }
                 else if (j != n - 2)
                 {
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_4(X[j]) / hy / hy;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_4(X[j + 1]) / hy / hy;
                 }
                 else
                 {
-                    f[i * (n - 1) + j] = F(X[j], Y[i]) - phi_4(X[j]) / hy / hy - phi_2(Y[i]) / hx / hx;
+                    f[i * (n - 1) + j] = F(X[j + 1], Y[i + 1]) - phi_4(X[j + 1]) / hy / hy - phi_2(Y[i + 1]) / hx / hx;
                 }
             }
         }
     }
+
+    //cout << " f size is  " << f.size() << endl;
     return f;
 }
+
 vector<double> Matrix_Vector_Multiplication(int n, int m , double alpha, double betta, double gamma, vector<double> f)
 {
-    double new_betta = betta / alpha, new_gamma = gamma / alpha;
+    double new_betta =  -betta / alpha, new_gamma = -gamma / alpha;
     vector<double> temp(f.size());
     //cout << f.size() << endl;
     // задал решение для первой строчки u 
@@ -160,19 +163,27 @@ double NormaRazn(vector<double> a1, vector<double> a2)
     }
     return raz;
 }
-
-vector<double> Ex1(int n_want, int m_want) 
+double MaxRazn(vector<double> a1, vector<double> a2)
 {
-    int n = n_want - 1, m = m_want - 1;
-    double hx = Lx / n, hy = Ly / m;
-    double alpha = -2 * (1. / hx / hx + 1. / hy / hy), betta = 1. / hx / hx, gamma = 1. / hy / hy;
+    double raz = 0;
+    for (int i = 0; i < a1.size(); i++)
+    {
+        if (abs(a1[i] - a2[i]) > raz)
+            raz = abs(a1[i] - a2[i]);
+    }
+    return raz;
+}
+vector<double> Ex1(int n, int m)  // n - номер послежней точки, точки идут как 0 .. n 
+{
+    double hx = Lx / n, hy = Ly /  m;
+    double alpha = -2. / hx / hx - 2. / hy / hy, betta = 1. / hx / hx, gamma = 1. / hy / hy;
 
     vector<double> f = Make_F_vector(n, m);
     for (int i = 0; i < (n - 1) * (m - 1); i++)
         f[i] = f[i] / alpha;
-
+    //PrintVector(f);
     vector<double> temp_u = f;
-    cout << "alpha = " << alpha << ", " << "betta = " << betta << ", " << "gamma = " << gamma << endl;
+    //cout << "alpha = " << alpha << ", " << "betta = " << betta << ", " << "gamma = " << gamma << endl;
 
     double raz = 1;
     do
@@ -180,13 +191,14 @@ vector<double> Ex1(int n_want, int m_want)
         vector<double> new_u = Matrix_Vector_Multiplication(n, m, alpha, betta, gamma, temp_u);
         for (int i = 0; i < f.size(); i++)
         {
-            new_u[i] += f[i];
+            new_u[i] = f[i] + new_u[i];
         }
-        raz = NormaRazn(new_u, temp_u);
+        raz = MaxRazn(new_u, temp_u);
         //cout << raz << endl;
         temp_u = new_u;
-    } while (raz > 1e-6);
-    cout << "size is " << temp_u.size() << endl;
+    } while (raz > 1e-10);
+    //cout << "size is " << temp_u.size() << endl;
+
     return temp_u;
 }
 //Метод последовательной верхней релаксации(SOR)
@@ -207,26 +219,26 @@ vector<double> SOR(int n, int m, double alpha, double betta, double gamma, vecto
         
         if (l == (n - 1) * (m - 1) - 1 )
             sum1 += alpha * x[l];
-        else if ( (n - 1) * (m - 2) <= l )
+        else if ( (n - 1) * (m - 2) <= l)
             sum1 += alpha * x[l] + betta * x[l + 1];
         else if (l % ( n - 1) ==  0)
-            sum2 += alpha * x[l] + gamma * x[l + (n -1)];
+            sum2 += alpha * x[l] + gamma * x[l + (n - 1)];
         else
             sum1 += alpha * x[l]  + betta * x[l + 1] + gamma * x[l + (n - 1)];
         
         x1[l] = x[l] + w * (b[l] - sum1 - sum2) / alpha;
     }
+    
     return x1;
 }
-vector<double> Ex2(int n_want, int m_want)
+vector<double> Ex2(int n, int m) // n - номер послеженй точки 
 {
-    int n = n_want - 1, m = m_want - 1;
-    double hx = Lx / n, hy = Ly / m;
+    double hx = Lx / n , hy = Ly / m ;
     double alpha = -2 * (1. / hx / hx + 1. / hy / hy), betta = 1. / hx / hx, gamma = 1. / hy / hy;
 
     vector<double> f = Make_F_vector(n, m);
 
-    vector<double> u1 ((n - 1) * (m - 1) , 5) , u2((n - 1) * (m - 1), 0);
+    vector<double> u1((n - 1) * (m - 1), 0), u2((n - 1) * (m - 1), 0);
     double raz;
 
     do
@@ -234,7 +246,7 @@ vector<double> Ex2(int n_want, int m_want)
         raz = 0.0;
         u2 = SOR(n, m, alpha, betta, gamma, u1, f, 1);
    
-        for (int i = 0; i < (n-1) * (m - 1); i++)
+        for (int i = 0; i < (n - 1) * (m - 1); i++)
         {
             if (abs(u2[i] - u1[i]) > raz)
             {
@@ -245,15 +257,44 @@ vector<double> Ex2(int n_want, int m_want)
         {
             u1[i] = u2[i];
         }
-    } while (raz > 1e-7);
+        //PrintVector(u2);
+    } while (raz > 1e-10);
 
     return u2;
 }
+vector<double> vector_true_U(int n, int m)
+{
+    double hx = Lx / n, hy = Ly / m;
+    vector<double> X(n + 1);
+    vector<double> Y(m + 1);
+    for (int i = 0; i <= n; i++)
+        X[i] = i * hx;
+    for (int i = 0; i <= m; i++)
+        Y[i] = i * hy;
+    vector<double> temp((n - 1) * (m - 1));
+    for (int i = 0; i < m - 1; i++)
+    {
+        for (int j = 0; j < n - 1; j++)
+        {
+            temp[i * (n - 1) + j] = True_U(X[j + 1], Y[i + 1]);
+        }
+    }
+    return temp;
+}
+vector<double> Ex3(int n, int m)
+{
+    double hx = Lx / n, hy = Ly / m;
+    double alpha = -2 * (1. / hx / hx + 1. / hy / hy), betta = 1. / hx / hx, gamma = 1. / hy / hy;
 
+}
 int main()
 {
-    //PrintVector(Ex1(10, 4));
-    PrintVector(Ex2(10, 5));
+    //Ex1(50, 50);
+    //Ex2(100, 100);
+    //PrintVector(Ex1(100, 100));
+    //PrintVector(Ex2(4, 4));
+    cout << "max razn = " << MaxRazn(Ex2(50, 50), vector_true_U(50, 50));
+    cout << "max razn = " << MaxRazn(Ex2(50, 50), Ex1(50, 50));
     return 0;
 }
 
