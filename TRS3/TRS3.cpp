@@ -285,38 +285,150 @@ vector<double> Ex3(int n, int m)
 {
 	double hx = Lx / n, hy = Ly / m;
 	double alpha = -2 * (1. / hx / hx + 1. / hy / hy), betta = 1. / hx / hx, gamma = 1. / hy / hy;
+	vector<double> f = Make_F_vector(n, m);
 	vector<double> otv((n - 1) * (m - 1), 0);
-	vector<vector<double>>diag_matrix((n - 1) * (m - 1), vector<double>(n));
-	for (int i = 0; i < m - 1; i++)
+	vector<vector<double>>diag_matrix((n - 1) * (m - 1), vector<double>(n + n - 1));
+	//задаем значения матрицы для всех элементов 
+	diag_matrix[0][n - 1] = alpha;
+	diag_matrix[0][n] = betta;
+	diag_matrix[0][2 * n - 2] = gamma;
+	for (int j = 1; j < n - 2; j++)
+	{
+		diag_matrix[j][n - 1] = alpha;
+		diag_matrix[j][n - 2] = betta;
+		diag_matrix[j][n] = betta;
+		diag_matrix[j][2 * n - 2] = gamma;
+	}
+	diag_matrix[(n - 2)][n - 1] = alpha;
+	diag_matrix[(n - 2)][n - 2] = betta;
+	diag_matrix[(n - 2)][2 * n - 2] = gamma;
+	
+	for (int i = 1; i < m - 2; i++)
 	{
 		for (int j = 0; j < n - 2; j++)
 		{
-			diag_matrix[i * (n - 1) + j][0] = alpha;
-			diag_matrix[i * (n - 1) + j][1] = betta;
-			diag_matrix[i * (n - 1)][1] = betta;
+			diag_matrix[i * (n - 1) + j][n - 1] = alpha;
+			diag_matrix[i * (n - 1) + j][n - 2] = betta;
+			diag_matrix[i * (n - 1) + j][n] = betta;
+			diag_matrix[i * (n - 1) + j][0] = gamma;
+			diag_matrix[i * (n - 1) + j][2 * n - 2] = gamma;
 		}
-
-
+		diag_matrix[i * (n - 1) + (n - 2)][n - 1] = alpha;
+		diag_matrix[i * (n - 1) + (n - 2)][n - 2] = betta;
+		diag_matrix[i * (n - 1) + (n - 2)][0] = gamma;
+		diag_matrix[i * (n - 1) + (n - 2)][2 * n - 2] = gamma;
 	}
 
-	for (int i = 0; i < (m - 2); i++)
+	for (int j = (n - 1) * (m - 2); j < (n -1) * (m - 1) - 1; j++)
 	{
-		for (int j = 0; j < n - 1; j++)
+		diag_matrix[j][n - 1] = alpha;
+		diag_matrix[j][n - 2] = betta;
+		diag_matrix[j][n] = betta;
+		diag_matrix[j][0] = gamma;
+	}
+	diag_matrix[(n - 1) * (m - 1) - 1][n - 1] = alpha;
+	diag_matrix[(n - 1) * (m - 1) - 1][n - 2] = betta;
+	diag_matrix[(n - 1) * (m - 1) - 1][0] = gamma;
+	//////////////////////////
+	/*
+	for (int i = (n - 1) * (m - 2); i < (n - 1) * (m - 1); i++)
+	{
+		diag_matrix[i][0] = alpha;
+		diag_matrix[i][1] = betta;
+	}*/
+	//cout << alpha << " " << betta << " " << gamma << endl;
+	//PrintMatrix(diag_matrix);
+	//PrintVector(f);
+	for (int i = 0; i < m - 2; i++)
+	{
+		for(int j = 0; j < n - 1; j++)
 		{
+			double temp = diag_matrix[i * (n - 1) + j][ n - 1];
+			f[i * (n - 1) + j]  /= temp;
+			for (int k = 0; k < 2 * n - 1; k++)
+			{
+				diag_matrix[i * (n - 1) + j][k] /= temp;
+				
+			}
+			vector<double> koef(n, 0);
+			int iter = 1;
+			for (int w = n - 2; w >= 0; w--)
+			{
+				if (diag_matrix[i * (n - 1) + j + iter][w] != 0)
+					koef[iter] = diag_matrix[i * (n - 1) + j + iter][w];
+				iter++;
+			}
+			for (int w = 1 ; w <= n - 1; w++)
+			{
+				for (int k = n - 1; k < 2 * n - 1 ; k++)
+				{
+					diag_matrix[i * (n - 1) + j + w][k - w] -=  koef[w] * diag_matrix[i * (n - 1) + j][k];
+				}
+				f[i * (n - 1) + j + w] -= koef[w] * f[i * (n - 1) + j];
+			}
+				
+			//PrintMatrix(diag_matrix);
+			//PrintVector(f);
+			//вычислили коэфициенты для вычитания 
 
 		}
 	}
+	for (int j = 0; j < n - 2; j++)
+	{
+		double temp = diag_matrix[(m - 2) * (n - 1) + j][n - 1];
+		f[(m - 2) * (n - 1) + j] /= temp;
+		for (int k = 0; k < 2 * n - 1; k++)
+		{
+			diag_matrix[(m - 2) * (n - 1) + j][k] /= temp;
+		}
+		//PrintMatrix(diag_matrix);
+		vector<double> koef(abs( j - ( n - 1)), 0);
+		int iter = 1;
+		for (int w = n - 2; w > j; w--)
+		{
+			if (diag_matrix[(m - 2) * (n - 1) + j + iter][w] != 0)
+				koef[iter] = diag_matrix[(m - 2) * (n - 1) + j + iter][w];
+			iter++;
+			//PrintVector(koef);
+		}
 
+		for (int w = 1; w < min(n - 1 , abs( (n - 1) * (m - 1) - (m - 2) * (n - 1) - j) ); w++)
+		{
+			for (int k = n - 1; k < 2 * n - 1; k++)
+			{
+				diag_matrix[(m - 2) * (n - 1) + j + w][k - w] -= koef[w] * diag_matrix[(m - 2) * (n - 1) + j][k];
+			}
+			f[(m - 2) * (n - 1) + j + w] -= koef[w] * f[(m - 2) * (n - 1) + j];
+		}
+		//PrintVector(f);
+	}
+	f[(m - 1) * (n - 1) - 1] /= diag_matrix[(m - 1) * (n - 1) - 1][n - 1];
+	diag_matrix[(m - 1) * (n - 1) - 1][n - 1] = 1;
+	//PrintMatrix(diag_matrix);
+	//PrintVector(f);
+	// реализуем обратный ход 
+	otv[(n - 1) * (m - 1) - 1] = f[(n - 1) * (m - 1) - 1];
+	for (int i = (n - 1) * (m - 1) - 2; i >= 0; i--)
+	{
+		double temp = f[i];
+		for (int j = i + 1; j <= min(i + (n - 1), (n - 1) * (m - 1) - 1); j++)
+		{
+			temp -= diag_matrix[i][n - 1 + abs(j - i)] * otv[j];
+		}
+		otv[i] = temp;
+	}
+	
 	return otv;
 }
 int main()
 {
 	//Ex1(5, 5);
 	//Ex2(5, 5);
+	//Ex3(100, 100);
 	//PrintVector(Ex2(5, 5));
 	//PrintVector(Ex1(5, 5));
-	cout << "max razn = " << MaxRazn(Ex2(50, 20), vector_true_U(50, 20));
-	//cout << "max razn = " << MaxRazn(Ex2(50, 50), Ex1(50, 50));
+	cout << "max razn = " << MaxRazn(Ex3(50, 50), vector_true_U(50, 50));
+	cout << "max razn = " << MaxRazn(Ex2(50, 50), vector_true_U(50, 50));
 	return 0;
 }
 
